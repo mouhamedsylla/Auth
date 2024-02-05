@@ -23,3 +23,10 @@ func NewUser(name, email, password string) User{
 		Password: password,
 	}
 }
+
+type Update struct {
+	ToSelect string
+	Value1     string
+	ToUpdate string
+	Value2    string
+}

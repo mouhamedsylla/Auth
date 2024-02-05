@@ -5,8 +5,6 @@ import (
 	"reflect"
 )
 
-
-
 // The `Scan` function is a method of the `ORM` struct. It takes in a `table` interface and a variadic
 // parameter `columns` of type string. It returns a map with string keys and slice of interface{}
 // values.

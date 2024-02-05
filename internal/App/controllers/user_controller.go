@@ -3,7 +3,9 @@ package controllers
 import (
 	"auth/internal/App/models"
 	"auth/internal/utils"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
@@ -53,13 +55,13 @@ func (c *AuthController) DeleteUser() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		params := r.URL.Query()
 		if len(params["username"]) == 0 {
-				message := models.Message{
-					Error: "Bad Request",
-				}
-				utils.RespondWithJSON(w, message, http.StatusBadRequest)
-				return	
+			message := models.Message{
+				Error: "Bad Request",
+			}
+			utils.RespondWithJSON(w, message, http.StatusBadRequest)
+			return
 		}
-		name:= params["username"][0]
+		name := params["username"][0]
 		if err := c.gorm.Delete(models.User{}, "Username", name); err != nil {
 			message := models.Message{
 				Error: "Bad request" + err.Error(),
@@ -73,8 +75,30 @@ func (c *AuthController) DeleteUser() http.Handler {
 	})
 }
 
+
+
 func (c *AuthController) UpdateUser() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		
+		body, err := ioutil.ReadAll(r.Body)
+		var message models.Message
+		if err != nil {
+			message.Error =  "Error reading request body"
+			utils.RespondWithJSON(w, message, http.StatusBadRequest)
+			return
+		}
+
+		var data models.Update
+		err = json.Unmarshal(body, &data)
+		fmt.Println(data)
+		if err != nil {
+			message.Error = "Error unmarshaling JSON"
+			utils.RespondWithJSON(w, message, http.StatusBadRequest)
+			return
+		}
+
+		modifer := c.gorm.SetModel(data.ToSelect, data.Value1, models.User{})
+		modifer.UpdateField(data.Value2, data.ToUpdate).Update(c.gorm.Db)
+		message.Message = fmt.Sprintf("User %s password updated", data.ToSelect)
+		utils.RespondWithJSON(w, message, http.StatusOK)
 	})
 }
