@@ -2,6 +2,8 @@ package orm
 
 import "strings"
 
+type SqlFunc func() *SQLBuilder
+
 // The SQLBuilder type is used to construct SQL queries with parameters.
 // @property {string} query - The `query` property is a string that represents the SQL query being
 // built by the SQLBuilder. It will be used to store the SQL query as it is being constructed.
@@ -10,6 +12,7 @@ import "strings"
 type SQLBuilder struct {
 	query      string
 	parameters []interface{}
+	custom *SQLBuilder
 }
 
 // The NewSQLBuilder function returns a new instance of the SQLBuilder struct.
@@ -21,6 +24,10 @@ func NewSQLBuilder() *SQLBuilder {
 // and the parameters as a tuple of type `(string, []interface{})`. This allows the caller to retrieve
 // the final SQL query string and the parameters that were added to the query.
 func (b *SQLBuilder) Build() (string, []interface{}) {
+	if b.custom != nil {
+		b.query += b.custom.query
+		b.parameters = append(b.parameters, b.custom.parameters...)
+	}
 	return b.query, b.parameters
 }
 
@@ -73,7 +80,6 @@ func (b *SQLBuilder) Select(columns ...string) *SQLBuilder {
 	return b
 }
 
-
 // The `From` method is a function of the `SQLBuilder` struct. It is used to construct an SQL `FROM`
 // clause in a query.
 func (b *SQLBuilder) From(table *Table) *SQLBuilder {
@@ -104,5 +110,3 @@ func (b *SQLBuilder) Or(column string, value interface{}) *SQLBuilder {
 	b.parameters = append(b.parameters, value)
 	return b
 }
-
-

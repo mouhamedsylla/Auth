@@ -48,6 +48,7 @@ func (R *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		status, msg := HandleError(err)
 		w.WriteHeader(status)
 		w.Write([]byte(msg))
+		return
 	}
 	for _, middleware := range R.middlewares {
 		handler = middleware(handler)

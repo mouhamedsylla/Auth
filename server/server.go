@@ -25,6 +25,8 @@ func (s *Server) ConfigureRoutes() {
 	s.Router.Use(middleware.CORSMiddleware)
 	controller := controllers.NewAuthController(auth)
 	s.Router.Method(http.MethodPost).Handler("/register", controller.Register())
+	s.Router.Method(http.MethodGet).Handler("/getuser", controller.GetUser())
+	s.Router.Method(http.MethodDelete).Handler("/delete", controller.DeleteUser())
 }
 
 func (s *Server) StartServer(port string) error {

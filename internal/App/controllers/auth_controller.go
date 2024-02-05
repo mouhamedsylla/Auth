@@ -2,24 +2,12 @@ package controllers
 
 import (
 	"auth/internal/App/models"
-	"auth/internal/App/services"
 	"auth/internal/utils"
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 )
-
-type AuthController struct {
-	authService services.AuthService
-}
-
-func NewAuthController(authService services.AuthService) *AuthController {
-	return &AuthController{
-		authService: authService,
-	}
-}
 
 func (c *AuthController) Login(w http.ResponseWriter, r *http.Request) {
 
@@ -39,11 +27,10 @@ func (c *AuthController) Register() http.Handler {
 				Error: "Bad Request" + err.Error(),
 			}
 			utils.RespondWithJSON(w, message, http.StatusBadRequest)
-			log.Println(message)
 			return
 		}
-		gorm := utils.OrmInit("auth.db")
-		if err := gorm.Insert(user); err != nil {
+
+		if err := c.gorm.Insert(user); err != nil {
 			if shouldReturn := CheckExist(err, message, w); shouldReturn {
 				return
 			}

@@ -1,0 +1,6 @@
+[
+  {
+    "type": "sqlite",
+    "path": "/home/ahmed/Challenge/Microservice/Authentication/db/auth.db"
+  }
+]

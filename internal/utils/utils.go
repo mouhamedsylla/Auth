@@ -12,14 +12,8 @@ func OrmInit(dbName string) *orm.ORM {
 	return gorm
 }
 
-func RespondWithJSON(w http.ResponseWriter, data interface{}, statusCode int) {
-	jsonData, err := json.Marshal(data)
-	if err != nil {
-		http.Error(w, "Erreur lors de la conversion en JSON", http.StatusInternalServerError)
-		return
-	}
+func RespondWithJSON(w http.ResponseWriter, data any, statusCode int) {
+	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	if _, err := w.Write(jsonData); err != nil {
-		return
-	}
+	json.NewEncoder(w).Encode(data)
 }
